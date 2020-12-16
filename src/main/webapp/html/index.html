@@ -25,11 +25,6 @@
                     <span>密码</span>
                     <input type="password" name="pwd_log" id="comPassword" ><span></span>
                 </label>
-<!--                <label>-->
-<!--                    <span>验证码(点击刷新)</span>-->
-<!--                    <input type="submit" id="code" onClick="change();"style="border:none;margin-bottom:25px">-->
-<!--                    <input type="text" class="code" placeholder="请输入验证码">-->
-<!--                </label>-->
                 <p class="forgot-pass"><a href="javascript:">忘记密码？</a></p>
                 <button type="button" class="submit" onclick="buslogin()">登 录</button>
                 <button type="button" class="fb-btn" onclick="log_stu()">使用 <span>学生</span> 帐号登录</button>
@@ -47,11 +42,6 @@
                 <span>密码</span>
                 <input type="password" name="pwd_log" id="stuPassword" ><span></span>
             </label>
-<!--            <label>-->
-<!--                <span>验证码(点击刷新)</span>-->
-<!--                <input type="button" id="code1" onClick="change1();"style="border:none;margin-bottom:25px">-->
-<!--                <input type="text" class="code" placeholder="请输入验证码">-->
-<!--            </label>-->
             <p class="forgot-pass"><a href="javascript:">忘记密码？</a></p>
             <button type="button" class="submit" onclick="stulogin()">登 录</button>
             <button type="button" class="fb-btn"onclick="log_bus()">使用 <span>企业合作</span> 帐号登录</button>
@@ -87,21 +77,7 @@
                     <span style="color: #000000; ">确认密码</span>
                     <input type="password" name="pwd_reg" id="pwd_reg" /><img src="" style="height: 14px;width: 14px;"><span id="pwdtip"> 请再次填写密码</span>
                 </label>
-<!--                <label>-->
-<!--                    <div class="verify">-->
-<!--                     <div id="verify_box">-->
-<!--                        <div id="verify_xbox">-->
-<!--                            <div id="btn2">-->
-<!--                                <img class="img1"style=" height: 12px; top: 0;" src="images/lllllll.png"/>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;按住滑块，拖动到最右边-->
-<!--                     </div>-->
-<!--                    </div>-->
-<!--                    <h6>请滑动上方滑块验证</h6>-->
-<!--                </label>-->
                 <button type="button" class="submit">注 册</button>
-               
             </form>
             </div>
         </div>
@@ -142,7 +118,7 @@
         },function (response) {
             var data = JSON.parse(response);
             if(data.code == 200){
-                window.location.href="studentInfo.html";
+                window.location.href="StudentProfile.html";
             }
             else{
                 alert(data.message);
@@ -150,5 +126,23 @@
         })
     }
 
+    function register(){
+        $.post('/Job/doRegister',{
+            userId: $('#stuId').val(),
+            password: $('#stuPassword').val(),
+            companyName: $('#companyName').val(),
+            companySize: $('#companySize').val(),
+            companyProperty: $('#companyProperty').val(),
+            companyLocation: $('#companyLocation').val(),
+        },function (response) {
+            var data = JSON.parse(response);
+            if(data.code == 200){
+                window.location.href="CompanyInfo.html";
+            }
+            else{
+                alert(data.message);
+            }
+        })
+    }
 </script>
 </html>

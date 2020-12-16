@@ -3,7 +3,7 @@
 <mapper namespace="mapper.DeliverRecordInfoMapper">
 
     <select id="listDeliverRecordInfoWithJobNameAndCompanyName" resultMap="listDeliverRecordInfoWithJobNameAndCompanyNameResultMap">
-        SELECT deliver_id,status,resume_info.resume_id,job_info.job_id,job_name,company_info.company_id,company_name
+        SELECT deliver_id,status,deliver_record_info.create_time,resume_info.resume_id,job_info.job_id,job_name,company_info.company_id,company_name
         FROM deliver_record_info
         JOIN resume_info ON resume_info.resume_id = deliver_record_info.resume_id
         JOIN job_info ON  job_info.job_id = deliver_record_info.job_id
@@ -13,6 +13,7 @@
     <resultMap id="listDeliverRecordInfoWithJobNameAndCompanyNameResultMap" type="pojo.DeliverRecordInfo">
         <id column="deliver_id" property="deliverId"></id>
         <result column="status" property="status"></result>
+        <result column="create_time" property="createTime"></result>
         <result column="resume_id" property="resumeId"></result>
         <association property="jobInfo" javaType="pojo.JobInfo">
             <id column="job_id" property="jobId"></id>
@@ -39,13 +40,13 @@
         </if>
 
     </select>
-    <resultMap id="selectDR" type="pojo.DeliverRecordInfo" >
+    <resultMap id="selectDR" type="pojo.DeliverRecordInfo" autoMapping="true">
         <id property="deliverId" column="deliver_id"/>
         <result property="jobId" column="job_id"/>
         <result property="resumeId" column="resume_id"/>
         <result property="createTime" column="create_time"/>
         <result property="status" column="status"/>
-        <association property="resumeInfo" javaType="pojo.ResumeInfo">
+        <association property="resumeInfo" javaType="pojo.ResumeInfo" autoMapping="true">
             <id property="resumeId" column="r.resume_id"/>
             <result property="resumeName" column="resume_name"/>
             <result property="studentId" column="student_id"/>

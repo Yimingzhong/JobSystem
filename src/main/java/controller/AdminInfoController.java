@@ -135,6 +135,7 @@ public class AdminInfoController {
     }
 
     @RequestMapping("/uploadStudent")
+    @ResponseBody
     public String uploadStudent(@RequestBody List<Map> parmaMap){
         new Thread(
                 ()->{

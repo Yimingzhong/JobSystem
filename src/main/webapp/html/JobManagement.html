@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
     <title>就业管理系统-简历维护</title>
     <style>
         html,body{
@@ -26,10 +26,13 @@
         .el-menu{
             border: 0;
         }
+        [v-clock]{
+            display: none;
+        }
     </style>
 </head>
 <body>
-<div id="app">
+<div id="app" v-clock>
     <el-container>
         <el-header>
             <h3 style="color: white;">就业管理系统</h3>
@@ -115,9 +118,9 @@
 <!-- Vue -->
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <!-- 引入Element组件库 -->
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
 <!-- 引入axios -->
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.zhimg.com/axios/dist/axios.min.js"></script>
 <script>
     var app = new Vue({
         el: '#app',

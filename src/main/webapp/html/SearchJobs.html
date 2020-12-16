@@ -6,7 +6,7 @@
     <title>就业管理系统-查找职位</title>
 
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
     <style>
         html,body{
             height: 100%;
@@ -28,11 +28,14 @@
         .el-menu{
             border: 0;
         }
+        [v-clock]{
+            display: none;
+        }
     </style>
 </head>
 
-<body>
-<div id="app" style="height: 100%;">
+<body >
+<div id="app" v-clock>
         <el-container>
             <el-header style="background: #011e2c;">
                 <h3 style="color: white;">就业管理系统</h3>
@@ -43,7 +46,7 @@
                         <el-main>
                             <el-menu default-active="3"  background-color="#011e2c"
                                      text-color="#fff" active-text-color="#ffd04b">
-                                <el-menu-item index="1">
+                                <el-menu-item index="1" @click="gotoStudentProfile">
                                     <i class="el-icon-user-solid"></i>
                                     <span slot="title">个人信息</span>
                                 </el-menu-item>
@@ -105,8 +108,8 @@
                             </el-table-column>
                             <el-table-column label="操作">
                                 <template slot-scope="scope">
-                                    <el-button size="mini" @click="handleLearnMore(scope.$index, scope.row)">了解详情</el-button>
-                                    <el-button size="mini" @click="dialogVisible = true">投递简历</el-button>
+                                    <el-button size="mini" @click="handleLearnMore(scope.row)">了解详情</el-button>
+                                    <el-button size="mini" @click="row = scope.row;dialogVisible = true">投递简历</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -126,7 +129,7 @@
                             </span>
                             <span slot="footer" class="dialog-footer">
                                 <el-button @click="dialogVisible = false">取消</el-button>
-                                <el-button type="primary" @click="handleDelivery(scope.$index, scope.row)">确定</el-button>
+                                <el-button type="primary" @click="handleDelivery">确定</el-button>
                             </span>
                         </el-dialog>
                     </div>
@@ -137,9 +140,9 @@
 <!-- Vue -->
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <!-- 引入Element组件库 -->
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
 <!-- 引入axios -->
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.zhimg.com/axios/dist/axios.min.js"></script>
 <script>
     var appStyleSheet = new Vue({
         el: '#app',
@@ -165,7 +168,8 @@
             tableData: [],
             dialogVisible: false,
             resumes:[],
-            resumeRadio:''
+            resumeRadio:'',
+            row: Object,
         },
         methods: {
             initfn: function(){
@@ -195,15 +199,10 @@
                         item.createTime = new Date(item.createTime).toLocaleDateString();
                     });
                     that.resumes = data;
+                    that.resumeRadio = data[0].resumeId;
                 },function (err){
 
                 })
-            },
-            gotoResumesManagement: function (){
-              window.location.href = 'ResumeManagement.html';
-            },
-            gotoDeliveryRecord: function (){
-                window.location.href = 'DeliveryRecord.html'
             },
             searchJobs: function (){
                 var that = this;
@@ -219,12 +218,31 @@
 
                 })
             },
-            handleDelivery: function (index, row){
-                console.log(index, row);
+            handleDelivery: function (){
+                this.dialogVisible = false;
+                var that = this;
+                axios.get('../deliverResume?jobId='+that.row.jobId+'&resumeId='+that.resumeRadio).then(function (response){
+
+                },function (err){
+
+                })
             },
-            handleLearnMore: function (index, row){
-                console.log(index, row);
-            }
+            handleLearnMore: function (row){
+                console.log(row);
+            },
+            gotoStudentProfile: function (){
+                window.location.href = 'StudentProfile.html'
+            },
+            gotoResumesManagement: function (){
+                window.location.href = 'ResumeManagement.html';
+            },
+            gotoSearchJobs: function (){
+                window.location.href = 'SearchJobs.html';
+            },
+            gotoDeliveryRecord: function (){
+                window.location.href = 'DeliveryRecord.html'
+            },
+
         },
         created(){
             this.initfn();

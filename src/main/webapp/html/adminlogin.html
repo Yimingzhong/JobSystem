@@ -153,11 +153,9 @@
 	<div class="login">
 		<div class="log-con">
 			<span>登录</span>
-			<input type="text" class="name" placeholder="请输入管理员用户名">
-			<input type="text" class="password" placeholder="请输入密码">
-			<input type="text" class="code" placeholder="请输入验证码">
-			<input type="button" id="code" onClick="change();">
-			<a>立即登录</a>
+			<input type="text" id="id" class="name" placeholder="请输入管理员用户名">
+			<input type="text" id="password" class="password" placeholder="请输入密码">
+			<a onclick="login()">立即登录</a>
 		</div>
 	</div>
 </div>
@@ -296,27 +294,20 @@
 		count += 0.1;
 	}
 
-	//验证码
-	function change() {
-		code=$("#code");
-		// 验证码组成库
-		var arrays = new Array(
-				'1','2','3','4','5','6','7','8','9','0',
-				'a','b','c','d','e','f','g','h','i','j',
-				'k','l','m','n','o','p','q','r','s','t',
-				'u','v','w','x','y','z',
-				'A','B','C','D','E','F','G','H','I','J',
-				'K','L','M','N','O','P','Q','R','S','T',
-				'U','V','W','X','Y','Z'
-		);
-		codes='';// 重新初始化验证码
-		for(var i = 0; i<4; i++){
-			// 随机获取一个数组的下标
-			var r = parseInt(Math.random()*arrays.length);
-			codes += arrays[r];
-		}
-		// 验证码添加到input里
-		code.val(codes);
+	function login(){
+		$.post('/Job/doLogin',{
+			userId: $('#id').val(),
+			password: $('#password').val(),
+			identity: 3
+		},function (response) {
+			var data = JSON.parse(response);
+			if(data.code == 200){
+				window.location.href="AddStudent.html";
+			}
+			else{
+				alert(data.message);
+			}
+		})
 	}
 </script>
 

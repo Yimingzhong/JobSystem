@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
     <title>就业管理系统-简历维护</title>
     <style>
         html,body{
@@ -26,10 +26,13 @@
         .el-menu{
             border: 0;
         }
+        [v-clock]{
+             display: none;
+         }
     </style>
 </head>
 <body>
-<div id="app">
+<div id="app" v-clock>
     <el-container>
         <el-header>
             <h3 style="color: white;">就业管理系统</h3>
@@ -60,12 +63,10 @@
                 </el-container>
             </el-aside>
             <el-main>
-                <el-table :data="tableData">
+                <el-table :data="tableData" @row-click="watchResume">
                     <el-table-column prop="jobName" label="岗位名称" width="180">
                     </el-table-column>
                     <el-table-column prop="jobType" label="岗位类型" width="180">
-                    </el-table-column>
-                    <el-table-column prop="resumeName" label="简历名称" width="180">
                     </el-table-column>
                     <el-table-column prop="studentName" label="学生名称" width="180">
                     </el-table-column>
@@ -73,10 +74,16 @@
                     </el-table-column>
                     <el-table-column prop="deliverStatus" label="状态" width="180">
                     </el-table-column>
-                    <el-table-column label="操作" width="100">
+                    <el-table-column  width="180">
+                        <template slot="header" slot-scope="scope">
+                            <el-input
+                                    v-model="search"
+                                    size="mini"
+                                    placeholder="输入关键字搜索"/>
+                        </template>
                         <template slot-scope="scope">
-                            <el-button @click="deleteJob(scope.$index)" v-bind:disabled="disabled" type="text" size="small">录用</el-button>
-                            <el-button @click="deleteJob(scope.$index)" v-bind:disabled="disabled" type="text" size="small">拒用</el-button>
+                            <el-button @click="accept(scope.$index)" v-bind:disabled="tableData[scope.$index].disabled" type="text" size="small">录用</el-button>
+                            <el-button @click="refuse(scope.$index)" v-bind:disabled="tableData[scope.$index].disabled" type="text" size="small">拒用</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -96,9 +103,9 @@
 <!-- Vue -->
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <!-- 引入Element组件库 -->
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
 <!-- 引入axios -->
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.zhimg.com/axios/dist/axios.min.js"></script>
 <script>
     var app = new Vue({
         el: '#app',
@@ -115,7 +122,7 @@
             ],
             disabled: false,
             current: 0,
-            size: 5,
+            size: 10,
             total: 0,
         },
         methods:{
@@ -126,16 +133,28 @@
                 params.append('size',this.size);
                 axios.post("/Job/getDeliverRecord",params).then(response=>{
                     var data = JSON.parse(response.data).data;
+                    //状态处理
                     for(var i=0;i<data.length;i++){
-                        if(data.deliverStatus == '0'){
-                            data.deliverStatus = '已投递';
+                        data[i].disabled = true;
+                        if(data[i].deliverStatus == 0){
+                            data[i].deliverStatus = '已投递';
+                            data[i].disabled = false;
                         }
-                        if(data.deliverStatus == '-1'){
-                            data.deliverStatus = '拒用';
+                        if(data[i].deliverStatus == -1){
+                            data[i].deliverStatus = '拒用';
                         }
-                        if(data.deliverStatus == '1'){
-                            data.deliverStatus = '录用';
+                        if(data[i].deliverStatus == 1){
+                            data[i].deliverStatus = '录用';
                         }
+                        if(data[i].deliverStatus == 2){
+                            data[i].deliverStatus = '已接受offer';
+                        }
+                        if(data[i].deliverStatus == -2){
+                            data[i].deliverStatus = '已拒绝offer';
+                        }
+                    }
+                    if(data.length>0){
+                        that.total = data[0].total;
                     }
                     that.tableData = data;
                 })
@@ -145,14 +164,62 @@
                 that.current = val;
                 var params = new URLSearchParams();
                 params.append('current', that.current);
-                axios.post("/Job/getMyJobs",params)
-                    .then(function (reponse) {
+                params.append('size',this.size);
+                axios.post("/Job/getDeliverRecord",params)
+                    .then(function (response) {
+                        var data = JSON.parse(response.data).data;
+                        for(var i=0;i<data.length;i++){
+                            data[i].disabled = true;
+                            if(data[i].deliverStatus == 0){
+                                data[i].deliverStatus = '已投递';
+                                data[i].disabled = false;
+                            }
+                            if(data[i].deliverStatus == -1){
+                                data[i].deliverStatus = '拒用';
+                            }
+                            if(data[i].deliverStatus == 1){
+                                data[i].deliverStatus = '录用';
+                            }
+                            if(data[i].deliverStatus == 2){
+                                data[i].deliverStatus = '已接受offer';
+                            }
+                            if(data[i].deliverStatus == -2){
+                                data[i].deliverStatus = '已拒绝offer';
+                            }
+                        }
 
+                        that.tableData = data;
                         },function (err) {
 
                         }
                     );
             } ,
+            accept: function(index){
+                var e = this.tableData[index];
+                var that = this;
+                axios.post("/Job/employ/"+e.deliverId+"/true").then(
+                    function (response) {
+                        e.deliverStatus = '已录用';
+                        e.disabled = true;
+                    }
+                )
+            },
+            refuse: function(index){
+                var e = this.tableData[index];
+                var that = this;
+                axios.post("/Job/employ/"+e.deliverId+"/false").then(
+                    function (response) {
+                        e.deliverStatus = '已拒用';
+                        e.disabled = true;
+                    }
+                )
+            },
+            watchResume: function (row,col,event){
+                if(col.id == "el-table_1_column_6") return ;
+                console.log(col);
+                var e = row.url;
+                window.open(e, '_blank').location;
+            },
             gotoCompanyInfo: function () {
                 window.location.href='CompanyInfo.html';
             },
@@ -161,7 +228,7 @@
             },
             gotoCompanyDeliver: function (){
                 window.location.href='CompanyDeliver.html'
-            }
+            },
         },
         mounted(){
             this.initfun();

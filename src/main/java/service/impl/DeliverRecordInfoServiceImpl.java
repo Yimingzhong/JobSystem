@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import util.json.RestResult;
 import util.json.ResultCode;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,13 +45,18 @@ public class DeliverRecordInfoServiceImpl extends ServiceImpl<DeliverRecordInfoM
         List<HashMap<String , Object>> restList = new ArrayList<>();
         for(DeliverRecordInfo record : records){
             HashMap<String , Object> hs = new HashMap<>();
+            hs.put("deliverId",record.getDeliverId());
+            hs.put("total",deliverRecordBySnameCid.getTotal());
             hs.put("jobName",record.getJobInfo().getJobName());
             hs.put("jobType",record.getJobInfo().getJobType());
             hs.put("resumeName",record.getResumeInfo().getResumeName());
             hs.put("studentName",record.getResumeInfo().getStudentInfo().getStudentName());
-            hs.put("time",record.getCreateTime());
+            SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+            hs.put("time",sd.format(record.getCreateTime()));
             hs.put("resumeId",record.getResumeId());
             hs.put("deliverStatus",record.getStatus());
+            hs.put("url",record.getResumeInfo().getUrl());
+            System.out.println(record.getResumeInfo().getUrl());
             restList.add(hs);
         }
         return new RestResult().setData(restList).setCode(ResultCode.SUCCESS).toString();
@@ -87,6 +93,7 @@ public class DeliverRecordInfoServiceImpl extends ServiceImpl<DeliverRecordInfoM
             recordInfo.setStatus(DeliverRecordInfo.UNACCEPTED);
             restResult.setCode(ResultCode.SUCCESS).setMessage("已拒绝offer");
         }
+        deliverRecordInfoMapper.updateById(recordInfo);
         return restResult.toString();
     }
 }

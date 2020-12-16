@@ -50,9 +50,14 @@ public class LoginController {
             if (user == null)
                 result.setCode(ResultCode.FAIL).setMessage("用户不存在");
             else if (user.getPassword().equals(password)) {
-                session.setAttribute("user", userId);
-                session.setAttribute("userName",user.getCompanyName());
-                result.setCode(ResultCode.SUCCESS).setMessage("验证成功");
+                if(user.getCompanyStatus()==CompanyInfo.CHECKING){
+                    result.setCode(ResultCode.FAIL).setMessage("尚未通过审核");
+                }
+                else{
+                    session.setAttribute("user", userId);
+                    session.setAttribute("userName",user.getCompanyName());
+                    result.setCode(ResultCode.SUCCESS).setMessage("验证成功");
+                }
             } else {
                 result.setCode(ResultCode.FAIL).setMessage("密码错误");
             }

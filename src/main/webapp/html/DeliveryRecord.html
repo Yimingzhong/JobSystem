@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://unpkg.zhimg.com/element-ui@2.14.1/lib/theme-chalk/index.css">
     <title>就业管理系统-投递记录</title>
     <style>
         html,body{
@@ -29,10 +29,13 @@
         .el-upload,.el-upload-dragger{
             width: 100%;
         }
+        [v-clock]{
+            display: none;
+        }
     </style>
 </head>
 <body>
-<div id="app">
+<div id="app" v-clock>
     <el-container>
         <el-header>
             <h3 style="color: white;">就业管理系统</h3>
@@ -44,7 +47,7 @@
                         <el-menu default-active="4"  background-color="#011e2c"
                                  text-color="#fff" active-text-color="#ffd04b">
                             <el-menu-item index="1">
-                                <i class="el-icon-user-solid"></i>
+                                <i class="el-icon-user-solid" @click="gotoStudentProfile"></i>
                                 <span slot="title">个人信息</span>
                             </el-menu-item>
                             <el-menu-item index="2" @click="gotoResumesManagement">
@@ -92,9 +95,9 @@
                         </el-table-column>
                         <el-table-column prop="" label="操作">
                             <template slot-scope="scopeProp">
-                                <el-button type="primary" size="mini" v-if="scopeProp.row.status==1" @click="handleAcceptOffer">接受offer</el-button>
+                                <el-button type="primary" size="mini" v-if="scopeProp.row.status==1" @click="handleAcceptOffer(scopeProp.row)">接受offer</el-button>
                                 <el-button type="primary" size="mini" disabled v-else>接受offer</el-button>
-                                <el-button size="mini" v-if="scopeProp.row.status==1" @click="handelRefuseOffer">拒绝offer</el-button>
+                                <el-button size="mini" v-if="scopeProp.row.status==1" @click="handleRefuseOffer(scopeProp.row)">拒绝offer</el-button>
                                 <el-button size="mini" disabled v-else>拒绝offer</el-button>
                             </template>
                         </el-table-column>
@@ -107,9 +110,9 @@
 <!-- Vue -->
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <!-- 引入Element组件库 -->
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.zhimg.com/element-ui/lib/index.js"></script>
 <!-- 引入axios -->
-<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.zhimg.com/axios/dist/axios.min.js"></script>
 
 <script>
     var app = new Vue({
@@ -122,7 +125,7 @@
         methods: {
             initfn: function (){
                 var that = this;
-                axios.get('../getMyInfo').then(function(response){
+                axios.get('/Job/getMyInfo').then(function(response){
                     var data = JSON.parse(response.data).data;
                     console.log(data);
                     that.studentId = data.studentId;
@@ -130,9 +133,10 @@
                 },function(err){
 
                 });
-                axios.get('../getRecord').then(function (response){
+                axios.get('/Job/getRecord').then(function (response){
                     var data = JSON.parse(response.data).data;
                     data.forEach(function (item){
+                        console.log(item);
                         console.log(item.createTime);
                         item.createTime = new Date(item.createTime).toLocaleDateString();
                     });
@@ -142,13 +146,13 @@
 
                 })
             },
-            handleAcceptOffer: function (index, row){
-                console.log(index, row);
-                axios.get('/commitOffer?deliverId='+row.deliverId+'&flag=true');
+            handleAcceptOffer: function (row){
+                console.log(row);
+                axios.get('/Job/commitOffer?deliverId='+row.deliverId+'&flag=true');
             },
-            handleRefuseOffer: function (index, row){
-                console.log(index, row);
-                axios.get('/commitOffer?deliverId='+row.deliverId+'&flag=false');
+            handleRefuseOffer: function (row){
+                console.log( row);
+                axios.get('/Job/commitOffer?deliverId='+row.deliverId+'&flag=false');
             },
             gotoStudentInfo: function (){
                 window.location.href = '';
@@ -158,6 +162,9 @@
             },
             gotoResumesManagement: function (){
                 window.location.href = 'ResumeManagement.html';
+            },
+            gotoStudentProfile: function (){
+                window.location.href = 'StudentProfile.html'
             }
         },
         created(){

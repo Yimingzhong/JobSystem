@@ -60,8 +60,7 @@ public class StudentInfoController {
     @RequestMapping("/getMyInfo")//请求路径（ajax接口）
     @ResponseBody
     public String getStudentInfo(HttpSession session){
-        //String studentId = (String) session.getAttribute("user");
-        String studentId = "2220172361";
+        String studentId = (String) session.getAttribute("user");
         StudentInfo student = studentInfoService.getById(studentId);
         return new RestResult()
                 .setCode(ResultCode.SUCCESS)
@@ -72,8 +71,7 @@ public class StudentInfoController {
     @RequestMapping("/getMyResumes")
     @ResponseBody
     public String getStudentResumes(HttpSession session){
-//        String studentId = (String) session.getAttribute("user");
-        String studentId = "2220172361";
+        String studentId = (String) session.getAttribute("user");
         //存放查询结果的list
         List<ResumeInfo> resumeInfos;
         //设置查询条件的wrapper
@@ -91,16 +89,20 @@ public class StudentInfoController {
     @ResponseBody
     public String uploadResume(@RequestParam("file") MultipartFile file, HttpServletRequest request){
         String studentId = (String) request.getSession().getAttribute("user");
-//        String studentId = "2220172361";
-        //String resumeName = (String) request.getParameter("resumeName");
-        String resumeName = "myResume";
+        String resumeName = file.getOriginalFilename();
         //传输简历pdf文件
         //设置文件存储路径
-        String storagePath = request.getRealPath("/uploads");
+        String storagePath = "/Job/uploads/"+studentId;
+        String realPath = request.getRealPath("/uploads/"+studentId);
+        //如果文件存储路径不存在，则新建
+        File filePath = new File(realPath,resumeName);
+        if(!filePath.getParentFile().exists()){
+            filePath.getParentFile().mkdirs();
+        }
         //判断文件是否为空
         if(!file.isEmpty()){
             try{
-                file.transferTo(new File(storagePath+ File.separator+resumeName));//把文件写入目标文件地址
+                file.transferTo(new File(realPath+ File.separator+resumeName));//把文件写入目标文件地址
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -111,7 +113,7 @@ public class StudentInfoController {
         resumeInfo.setResumeName(resumeName);
         resumeInfo.setResumeStatus(0);//unknow
         resumeInfo.setStudentId(studentId);
-        resumeInfo.setUrl(storagePath+"/"+resumeName+".pdf");
+        resumeInfo.setUrl(storagePath+"/"+resumeName);
         resumeInfoService.save(resumeInfo);
         return new RestResult().setCode(ResultCode.SUCCESS).toString();
     }
@@ -119,7 +121,6 @@ public class StudentInfoController {
     @ResponseBody
     public String deleteResume(HttpSession session, @RequestBody(required = true)Map<String,Object> map){
         String studentId = (String) session.getAttribute("user");
-//        String studentId = "2220172361";
         String resumeId = (String) map.get("resumeId");
         ResumeInfo resumeInfo = resumeInfoService.getById(resumeId);
         resumeInfo.setResumeStatus(-1);
@@ -130,7 +131,6 @@ public class StudentInfoController {
     @ResponseBody
     public String getJobs(HttpSession session, @RequestBody GetJobsRequestBody getJobsRequestBody){
         String studentId = (String) session.getAttribute("user");
-//        String studentId = "2220172361";
         String companyName = getJobsRequestBody.getCompanyName();
         String jobName = getJobsRequestBody.getJobName();
         String jobType = getJobsRequestBody.getJobType();
@@ -163,8 +163,7 @@ public class StudentInfoController {
     @RequestMapping("/getRecord")
     @ResponseBody
     public String getDeliverRecord(HttpSession session){
-//        String studentId = (String) session.getAttribute("user");
-        String studentId = "2220172361";
+        String studentId = (String) session.getAttribute("user");
         int current = 1;
         int size = 20;
         IPage<DeliverRecordInfo> deliverRecordInfoIPage = new Page<>(current,size);
@@ -189,6 +188,8 @@ public class StudentInfoController {
     @RequestMapping("/deliverResume")
     @ResponseBody
     public String deliver(String resumeId,String jobId){
+        System.out.println(resumeId);
+        System.out.println(jobId);
         DeliverRecordInfo info = new DeliverRecordInfo();
         info.setJobId(jobId);
         info.setResumeId(resumeId);
